@@ -5,15 +5,16 @@ const { getToken } = require('./getToken');
 const { getLambdaToken } = require("./getLambdaToken");
 
 const getLamdaToken = async (identity, config) => {
+  
   const chatGrant = new ChatGrant({
     serviceSid: config.twilio.chatService
   });
-  
+
    const token = await getLamdaToken(identity);
-   console.log("Lambda Token JWT"+ JSON.stringify(token.tokenJWT));
+   console.log("Lambda Token JWT"+ token);
 
    token.identity = identity;
-   const jwtToken = token.tokenJWT;
+   const jwtToken = token.token;
    console.log("identity" + identity);
    console.log("Lambda Chat Token" + JSON.stringify(token));
  
