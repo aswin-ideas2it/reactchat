@@ -1,6 +1,27 @@
 const twilio = require('twilio');
 const AccessToken = twilio.jwt.AccessToken;
 const { ChatGrant, VideoGrant } = AccessToken;
+const { getToken } = require('./getToken');
+
+const getChatToken = async (identity, config) => {
+  
+  const chatGrant = new ChatGrant({
+    serviceSid: config.twilio.chatService
+  });
+
+  const token = await getToken(identity);
+  console.log("Lambda Token JWT"+ JSON.stringify(token.tokenJWT));
+
+  token.identity = identity;
+  const jwtToken = token.tokenJWT;
+  console.log("identity" + identity);
+  console.log("Lambda Chat Token" + JSON.stringify(token));
+
+  return {
+    token,
+    jwtToken
+  }
+};
 
 const chatToken = (identity, config) => {
   const chatGrant = new ChatGrant({
@@ -11,8 +32,12 @@ const chatToken = (identity, config) => {
     config.twilio.apiKey,
     config.twilio.apiSecret
   );
+  console.log("token" + JSON.stringify(token));
   token.addGrant(chatGrant);
+
   token.identity = identity;
+  console.log("identity" + identity);
+  console.log("chat token" + JSON.stringify(token));
   return token;
 };
 
@@ -33,4 +58,4 @@ const videoToken = (identity, room, config) => {
   return token;
 };
 
-module.exports = { chatToken, videoToken };
+module.exports = { chatToken, videoToken, getChatToken };

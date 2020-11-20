@@ -2,7 +2,7 @@ const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const pino = require('express-pino-logger')();
-const { chatToken, videoToken } = require('./tokens');
+const { chatToken, videoToken, getChatToken } = require('./tokens');
 const {getToken} = require("./getToken");
 
 const app = express();
@@ -20,9 +20,13 @@ const sendTokenResponse = (token, res) => {
 };
 
 
-app.post('/getToken', (req,res)=>{
-    const token = getToken(req.query.identity);
-    return token;
+app.get('/getToken', (req,res)=>{
+    const lambdaToken = getToken();
+    lambdaToken.then(function(result){
+      console.log("ui" + result);
+      res.send(result);
+    })
+    
 });
 
 app.get('/api/greeting', (req, res) => {
@@ -37,10 +41,17 @@ app.get('/chat/token', (req, res) => {
   sendTokenResponse(token, res);
 });
 
-app.post('/chat/token', (req, res) => {
+app.post('/chat/token', async (req, res) => {
   const identity = req.body.identity;
-  const token = chatToken(identity, config);
-  sendTokenResponse(token, res);
+  //const token = chatToken(identity, config);
+  const token = await getChatToken(identity, config);
+  console.log(token);
+  res.send(
+    JSON.stringify({
+      token: token.jwtToken
+    })
+  );
+  //sendTokenResponse(token, res);
 });
 
 app.get('/video/token', (req, res) => {
