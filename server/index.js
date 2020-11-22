@@ -2,7 +2,7 @@ const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const pino = require('express-pino-logger')();
-const { chatToken, videoToken, getChatToken } = require('./tokens');
+const { chatToken, videoToken } = require('./tokens');
 const {getToken} = require("./getToken");
 const {getLambdaToken} = require('./getLambdaToken');
 
@@ -44,14 +44,6 @@ app.get('/chat/token', (req, res) => {
 
 app.post('/chat/token', async (req, res) => {
   const identity = req.body.identity;
-  //const token = chatToken(identity, config);
-  /*const token = await getChatToken(identity, config);
-  console.log(token);
-  res.send(
-    JSON.stringify({
-      token: token.jwtToken
-    })
-  );*/
   var token = await getLambdaToken(identity);
   token.identity = identity;
   token = JSON.parse(token);

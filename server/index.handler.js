@@ -1,5 +1,5 @@
 exports.handler = async (event) => {
-
+    
     const accountSid =  process.env.TWILIO_ACCOUNT_SID;
     const authToken  =  process.env.TWILIO_AUTH_TOKEN;
     const apiKey     =  process.env.TWILIO_API_KEY;
@@ -9,9 +9,14 @@ exports.handler = async (event) => {
     const twilio = require('twilio')(accountSid, authToken); 
     const AccessToken = require('twilio').jwt.AccessToken;
     const ChatGrant = AccessToken.ChatGrant;
+    const operation = event.operation;
+    const client = event.client;
+
+    const {identity} = JSON.parse(event.body);
 
     const accessToken = new AccessToken(accountSid, apiKey, apiSecret);
-    accessToken.identity = event;
+    accessToken.identity = identity;
+
 
     const chatGrant = new ChatGrant({
         serviceSid: chatService
@@ -23,6 +28,6 @@ exports.handler = async (event) => {
         token: accessToken,
         tokenJWT: accessToken.toJwt()
    };
-  
 };
+
 
